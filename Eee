@@ -1,0 +1,109 @@
+local JulHubLib = {}
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+function JulHubLib:CreateWindow(config)
+    config = config or {}
+    local title = config.Title or "JulHub"
+    local version = config.Version or "v1.0"
+
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "JulHubLibUI"
+    screenGui.ResetOnSpawn = false
+    screenGui.Parent = playerGui
+
+    local mainFrame = Instance.new("Frame", screenGui)
+    mainFrame.Size = UDim2.new(0, 420, 0, 280)
+    mainFrame.Position = UDim2.new(0.5, -210, 0.5, -140)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Name = "MainFrame"
+
+    local titleLabel = Instance.new("TextLabel", mainFrame)
+    titleLabel.Size = UDim2.new(1, 0, 0, 30)
+    titleLabel.Position = UDim2.new(0, 0, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = title
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 16
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.PaddingLeft = UDim.new(0, 10)
+
+    local versionLabel = Instance.new("TextLabel", mainFrame)
+    versionLabel.Size = UDim2.new(0, 50, 0, 20)
+    versionLabel.Position = UDim2.new(0, 10, 1, -20)
+    versionLabel.BackgroundTransparency = 1
+    versionLabel.Text = version
+    versionLabel.Font = Enum.Font.Gotham
+    versionLabel.TextSize = 12
+    versionLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+    versionLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    local container = Instance.new("Frame", mainFrame)
+    container.Name = "Container"
+    container.Position = UDim2.new(0, 10, 0, 40)
+    container.Size = UDim2.new(1, -20, 1, -60)
+    container.BackgroundTransparency = 1
+
+    local UIListLayout = Instance.new("UIListLayout", container)
+    UIListLayout.Padding = UDim.new(0, 6)
+    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    return setmetatable({
+        Container = container
+    }, {
+        __index = JulHubLib
+    })
+end
+
+function JulHubLib:AddButton(text, callback)
+    local button = Instance.new("TextButton", self.Container)
+    button.Size = UDim2.new(1, 0, 0, 30)
+    button.Text = text
+    button.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    button.BorderSizePixel = 0
+    button.Font = Enum.Font.Gotham
+    button.TextSize = 14
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+    button.MouseButton1Click:Connect(function()
+        if callback then callback() end
+    end)
+end
+
+function JulHubLib:AddToggle(text, default, callback)
+    local toggle = Instance.new("TextButton", self.Container)
+    toggle.Size = UDim2.new(1, 0, 0, 30)
+    toggle.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    toggle.BorderSizePixel = 0
+    toggle.Font = Enum.Font.Gotham
+    toggle.TextSize = 14
+    toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+    local state = default or false
+    local function update()
+        toggle.Text = (state and "☑ " or "☐ ") .. text
+    end
+    update()
+
+    toggle.MouseButton1Click:Connect(function()
+        state = not state
+        update()
+        if callback then callback(state) end
+    end)
+end
+
+function JulHubLib:AddLabel(text)
+    local label = Instance.new("TextLabel", self.Container)
+    label.Size = UDim2.new(1, 0, 0, 25)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.Font = Enum.Font.GothamSemibold
+    label.TextSize = 14
+    label.TextColor3 = Color3.fromRGB(0, 200, 255)
+end
+
+return JulHubLib
